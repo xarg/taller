@@ -1,0 +1,21 @@
+[import "fmt"]
+[extend "base.html"]
+[block content]
+This is a loop:
+<ul>
+[for x := range a_list_of_maps]
+	[var y := 500]
+	[if something == 0]
+		<li id="`x[1] + y`">\[`x[0].some_attr`\]</li>
+	[endif]
+	[if something == x]
+		`fmt.Sprintf("a")`
+	[else if something == y]
+		b
+	[else]
+		c
+	[endif]
+[endfor]
+</ul>
+[include "included.html"]
+[endblock]
