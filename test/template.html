@@ -1,10 +1,10 @@
+[extends "base.html"]
 [import "fmt"]
-[extend "base.html"]
 [block content]
 This is a loop:
 <ul>
-[for x := range a_list_of_maps]
-	[var y := 500]
+[for x := range a_list_of_maps.([]int)]
+	[y := 500]
 	[if something == 0]
 		<li id="`x[1] + y`">\[`x[0].some_attr`\]</li>
 	[endif]
@@ -19,3 +19,5 @@ This is a loop:
 </ul>
 [include "included.html"]
 [endblock]
+there is no life outside of the block in a template
+that extends another template
