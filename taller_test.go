@@ -5,27 +5,25 @@ import (
 	"os"
 	"path"
 	"bytes"
-	"io/ioutil"
 )
+
 const (
 	TESTDIR string = "test"
 )
 
 // return a template absolute path
-func template_path(template_name string) string {
+func update_environment() {
 	current_dir, _ := os.Getwd()
-	return path.Join(current_dir, TESTDIR, template_name)
-}
-
-func read_template(template_name string) []byte {
-	filepath := template_path(template_name)
-	content, _ := ioutil.ReadFile(filepath)
-	return content
+	err := os.Setenv(TALLER_ENV_VARIABLE, path.Join(current_dir, TESTDIR))
+	if err != nil {
+		panic("Failed to set environment variable" + err.String())
+	}
 }
 
 //test if we can open a file and read the contents out of it
 func TestTemplateFile(t *testing.T) {
-	template := NewTemplateFile(template_path("base.html"))
+	update_environment()
+	template := NewTemplateFile("base.html")
 	content := template.Content()
 	if bytes.Count(content, []byte("<html>")) != 1 {
 		t.Error("Cannot read the template")
@@ -42,13 +40,27 @@ func TestTemplateBytes(t *testing.T) {
 }
 
 //rendering base.html
-func TestBaseRender(t *testing.T) {
-	template := NewTemplateFile(template_path("base.html"))
-	rendered_content := Render(template)
-	expected_content := read_template("results/base.html")
+func TestBaseCompile(t *testing.T) {
+	/*
+	update_environment()
+	template := NewTemplateFile("base.html")
+	rendered_content := Compile(template)
+	expected_content := ReadTemplateFile("results/base.html")
 	if string(rendered_content) != string(expected_content) {
 		t.Errorf("Got: \n%s\nExpected: \n%s", rendered_content,
-		expected_content)
+			expected_content)
 	}
+	*/
 }
 
+//test a simple [expand "template"] and [include "include.html"]
+func TestExpandInclude(t *testing.T) {
+	update_environment()
+	template := NewTemplateFile("expand_include.html")
+	rendered_content := Render(template)
+	expected_content := ReadTemplateFile("results/expand_include.html")
+	if string(rendered_content) != string(expected_content) {
+		t.Errorf("Got: \n%s\nExpected: \n%s", rendered_content,
+			expected_content)
+	}
+}
