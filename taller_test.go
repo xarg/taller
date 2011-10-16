@@ -40,16 +40,16 @@ func TestTemplateBytes(t *testing.T) {
 }
 
 //rendering base.html
-func TestBaseCompile(t *testing.T) {
+func TestBaseRender(t *testing.T) {
 	/*
-	update_environment()
-	template := NewTemplateFile("base.html")
-	rendered_content := Compile(template)
-	expected_content := ReadTemplateFile("results/base.html")
-	if string(rendered_content) != string(expected_content) {
-		t.Errorf("Got: \n%s\nExpected: \n%s", rendered_content,
-			expected_content)
-	}
+		update_environment()
+		template := NewTemplateFile("base.html")
+		rendered_content := Compile(template)
+		expected_content := ReadTemplateFile("results/base.html")
+		if string(rendered_content) != string(expected_content) {
+			t.Errorf("Got: \n%s\nExpected: \n%s", rendered_content,
+				expected_content)
+		}
 	*/
 }
 
@@ -57,10 +57,52 @@ func TestBaseCompile(t *testing.T) {
 func TestExpandInclude(t *testing.T) {
 	update_environment()
 	template := NewTemplateFile("expand_include.html")
-	rendered_content := Render(template)
+	rendered_content := Render(template, Context{})
 	expected_content := ReadTemplateFile("results/expand_include.html")
 	if string(rendered_content) != string(expected_content) {
 		t.Errorf("Got: \n%s\nExpected: \n%s", rendered_content,
 			expected_content)
+	}
+}
+
+//utils
+
+//Check if split of paths works the way it's suppose to
+func TestGetTallerPaths(t *testing.T) {
+	os.Setenv(TALLER_ENV_VARIABLE, "aaa/b:xxx/yy")
+	paths := GetTallerPaths()
+	if len(paths) != 2 {
+		t.Errorf("Got: %d\nExpected: 2\n", len(paths))
+	}
+	if paths[0] != "aaa/b" {
+		t.Errorf("Got: %s\nExpected: %s\n", paths[0], "aaa/b")
+	}
+}
+
+//testing order resolution when reading the template.
+func TestReadTemplateFile(t *testing.T) {
+	current_dir, _ := os.Getwd()
+	os.Setenv(TALLER_ENV_VARIABLE, path.Join(current_dir, TESTDIR, "results")+":"+path.Join(current_dir, TESTDIR))
+	content := ReadTemplateFile("base.html")
+	expected := []byte(`<body>
+content`)
+	if bytes.Count(content, expected) != 1 {
+		t.Errorf("Cannot find:\n %s\n in:\n %s\n", expected, content)
+	}
+}
+
+func TestJoinBytes(t *testing.T) {
+	if !bytes.Equal(JoinBytes("a"), []byte("a")) {
+		t.Errorf("Got: %s\nExpected: %s\n", JoinBytes("a"), "a")
+	}
+	if !bytes.Equal(JoinBytes("a", "b"), []byte("ab")) {
+		t.Errorf("Got: %s\nExpected: %s\n", JoinBytes("ab"), "ab")
+	}
+}
+
+func TestSplitToLines(t *testing.T) {
+	splited := SplitToLines([]byte("a\nb"))
+	if !bytes.Equal(splited[0], []byte("a")) {
+		t.Errorf("Got: %s\nExpected: %s\n", splited[0], []byte("a"))
 	}
 }

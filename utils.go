@@ -16,6 +16,7 @@ func GetTallerPaths() []string {
 	return strings.Split(os.Getenv(TALLER_ENV_VARIABLE), ":")
 }
 
+//return the content of the first found template
 func ReadTemplateFile(filename string) []byte {
 	ok := false
 	for _, path_dir := range GetTallerPaths() {
@@ -23,7 +24,7 @@ func ReadTemplateFile(filename string) []byte {
 		if _, err := os.Stat(absolute_path); err != os.ENOENT {
 			filename = absolute_path
 			ok = true
-			break;
+			break
 		}
 	}
 	if !ok {
@@ -34,8 +35,8 @@ func ReadTemplateFile(filename string) []byte {
 		panic("Failed to read template file: " + err.String())
 	}
 	return content
-
 }
+
 //given a list of strings join them in a []byte
 func JoinBytes(string_list ...string) []byte {
 	var joined [][]byte

@@ -44,4 +44,3 @@ func Render(template Template, context Context) []byte {
 	compiled_path := Compile(Parse(template.Content()))
 	return Execute(compiled_path, context)
 }
-
